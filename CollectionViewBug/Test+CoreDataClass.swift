@@ -12,5 +12,10 @@ import CoreData
 
 @objc(Test)
 public class Test: NSManagedObject {
+    @nonobjc public class func fetchRequest() -> NSFetchRequest<Test> {
+        return NSFetchRequest<Test>(entityName: "Test")
+    }
 
+    @NSManaged public var a: String?
+    @NSManaged public var b: String?
 }

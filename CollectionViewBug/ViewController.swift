@@ -40,24 +40,28 @@ class ViewController: UIViewController {
 class MyCell: UICollectionViewCell {
     
     static let identifier = "MyCell"
-    
     var test: Test?
-    
     let btn = UIButton()
+    let label = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: .zero)
-        
         btn.setTitle("test", for: .normal)
         btn.setTitleColor(.black, for: .normal)
         btn.addTarget(self, action: #selector(doAction), for: .touchUpInside)
-        
         btn.translatesAutoresizingMaskIntoConstraints = false
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textColor = .darkText
+        
+        contentView.addSubview(label)
         contentView.addSubview(btn)
+        
         contentView.backgroundColor = .white
         
-        btn.centerYAnchor.constraint(equalTo: contentView.centerYAnchor, constant: 0).isActive = true
-        btn.centerXAnchor.constraint(equalTo: contentView.centerXAnchor, constant: 0).isActive = true
+        label.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 4).isActive = true
+        label.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 0).isActive = true
+        btn.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5).isActive = true
+        btn.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: 0).isActive = true
     }
     
     required init?(coder: NSCoder) {
@@ -65,7 +69,7 @@ class MyCell: UICollectionViewCell {
     }
     
     @objc func doAction() {
-        print("Action from cell \(self)")
+        // Set a new ID
         let testID = test!.objectID
         AppDelegate.persistentContainer.performBackgroundTask { ctx in
             let test = ctx.object(with: testID) as! Test
@@ -77,6 +81,8 @@ class MyCell: UICollectionViewCell {
     func update(test: Test) {
         self.test = test
         print("update(test:) -> \(self)")
+        // Update cell's label with new ID
+        label.text = test.a
     }
     
 }
@@ -95,10 +101,7 @@ class CollectionView: UICollectionView, NSFetchedResultsControllerDelegate, UICo
                                                                   sectionNameKeyPath: nil,
                                                                   cacheName: nil)
         
-        let size = NSCollectionLayoutSize(
-            widthDimension: NSCollectionLayoutDimension.fractionalWidth(1),
-            heightDimension: NSCollectionLayoutDimension.estimated(44)
-        )
+        let size = NSCollectionLayoutSize(widthDimension: NSCollectionLayoutDimension.fractionalWidth(1), heightDimension: NSCollectionLayoutDimension.estimated(100))
         let item = NSCollectionLayoutItem(layoutSize: size)
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: size, subitem: item, count: 1)
 
@@ -116,7 +119,7 @@ class CollectionView: UICollectionView, NSFetchedResultsControllerDelegate, UICo
                 let cell = collectionView.dequeueReusableCell(withReuseIdentifier: MyCell.identifier, for: indexPath) as! MyCell
                 let test = AppDelegate.persistentContainer.viewContext.object(with: testID as! NSManagedObjectID) as! Test
                 cell.update(test: test)
-                print("Requrning dequeued => \(cell)")
+                print("Returning dequeued => \(cell), test test.a => \(test.a!), \(indexPath)")
                 return cell
             }
         )
